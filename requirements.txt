@@ -1,7 +1,5 @@
 numpy
 pandas
-pyodbc
 seaborn
-sklearn
 statsmodels
 geopandas
