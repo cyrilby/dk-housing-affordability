@@ -3,3 +3,5 @@ pandas
 seaborn
 statsmodels
 geopandas
+plotly
+plotly-express
