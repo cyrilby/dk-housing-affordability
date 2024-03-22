@@ -1,3 +1,5 @@
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://dk-housing.streamlit.app/)
+
 # DK housing affordability
 
 - Author: kirilboyanovbg[at]gmail.com
