@@ -739,7 +739,7 @@ def page_indexed_dev(df):
     selected_loc = filter_by_single_location(df, "Municipality", "København")
     st.write(
         f"""This page shows the indexed developments in average sales price,
-        local disposable income and national GDP during the last {n_years}.
+        local disposable income and national GDP during the last {n_years} years.
         As such, it allows for comparisons between how much the price of housing
         has increased relative to the increase in local disposable income and
         relative to the growth of the national economy. Please use the
@@ -795,7 +795,7 @@ def page_indexed_dev(df):
 
     # Create a layout
     layout = go.Layout(
-        title="Indexed sales price, local disposable income and national GDP over time",
+        title=f"Indexed sales price and local disposable income in {selected_loc} vs. national GDP over time",
         xaxis=dict(title="Year"),
         yaxis=dict(title="Indexed value of indicators"),
     )
