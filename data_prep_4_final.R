@@ -71,7 +71,7 @@ FinalSalesAndIncome <- FinalSalesAndIncome %>%
   mutate(BaseAvgPrice = mean(BaseAvgPrice, na.rm = TRUE)) %>%
   ungroup() %>%
   mutate(AvgSalesPriceIdx = AvgSalesPrice / BaseAvgPrice) %>%
-  select(-BaseYearForMncp, -BaseAvgPrice)
+  select(-BaseYearForMncp,-BaseAvgPrice)
 
 # Calculating affordability indices for each municipality
 # Note: the "AvgM2AffordedIdx" indices includes both actual & imputed sales prices
@@ -105,15 +105,13 @@ FinalSalesAndIncome <- FinalSalesAndIncome %>%
     AvgM2AffordedWomenChange = (M2AffordedWomen - BaseAvgM2AffordedWomen) /
       BaseAvgM2AffordedWomen
   ) %>%
-  mutate(AvgM2AffordedTotalChange = round(100 * AvgM2AffordedTotalChange, 1),
-         AvgM2AffordedMenChange = round(100 * AvgM2AffordedMenChange, 1),
-         AvgM2AffordedWomenChange = round(100 * AvgM2AffordedWomenChange, 1)
-         ) %>%
+  mutate(
+    AvgM2AffordedTotalChange = round(100 * AvgM2AffordedTotalChange, 1),
+    AvgM2AffordedMenChange = round(100 * AvgM2AffordedMenChange, 1),
+    AvgM2AffordedWomenChange = round(100 * AvgM2AffordedWomenChange, 1)
+  ) %>%
   select(
-    -BaseYearForMncp,
-    -BaseAvgM2AffordedTotal,
-    -BaseAvgM2AffordedMen,
-    -BaseAvgM2AffordedWomen
+    -BaseYearForMncp,-BaseAvgM2AffordedTotal,-BaseAvgM2AffordedMen,-BaseAvgM2AffordedWomen
   )
 
 # Formatting data types, sorting in the correct order, etc.
@@ -136,7 +134,10 @@ the sales prices.
 
 # Selecting the already calculated sales price indices and disposable income
 IndexedDevelopment <- FinalSalesAndIncome %>%
-  select(Year, Municipality, AvgSalesPriceIdx, AvgDisposableIncomeTotal)
+  select(Year,
+         Municipality,
+         AvgSalesPriceIdx,
+         AvgDisposableIncomeTotal)
 
 # Adding data on the national GDP
 IndexedDevelopment <- IndexedDevelopment %>%
@@ -147,19 +148,40 @@ IndexedDevelopment <- IndexedDevelopment %>%
   group_by(Municipality) %>%
   mutate(BaseYearForMncp = min(Year, na.rm = TRUE)) %>%
   ungroup() %>%
-  mutate(BaseAvgDispIncome = ifelse(Year == BaseYearForMncp,
-                                 AvgDisposableIncomeTotal,
+  mutate(
+    BaseAvgDispIncome = ifelse(Year == BaseYearForMncp,
+                               AvgDisposableIncomeTotal,
                                NA),
-         BaseGDP = ifelse(Year == BaseYearForMncp,
-                                    GDP,
-                                    NA)) %>%
+    BaseGDP = ifelse(Year == BaseYearForMncp,
+                     GDP,
+                     NA)
+  ) %>%
   group_by(Municipality) %>%
-  mutate(BaseAvgDispIncome = mean(BaseAvgDispIncome, na.rm = TRUE),
-         BaseGDP = mean(BaseGDP, na.rm = TRUE)) %>%
+  mutate(
+    BaseAvgDispIncome = mean(BaseAvgDispIncome, na.rm = TRUE),
+    BaseGDP = mean(BaseGDP, na.rm = TRUE)
+  ) %>%
   ungroup() %>%
   mutate(AvgDispIncomeIdx = AvgDisposableIncomeTotal / BaseAvgDispIncome,
          GDPIdx = GDP / BaseGDP) %>%
-  select(-BaseYearForMncp, -BaseAvgDispIncome, -BaseGDP, -GDP, -AvgDisposableIncomeTotal)
+  select(-BaseYearForMncp,
+         -BaseAvgDispIncome,
+         -BaseGDP,
+         -GDP,
+         -AvgDisposableIncomeTotal)
+
+
+# Converting the df into the long format (easier to plot in plotly)
+IndexedDevelopment <- IndexedDevelopment %>%
+  pivot_longer(cols = c("AvgSalesPriceIdx", "AvgDispIncomeIdx", "GDPIdx")) %>%
+  rename(Indicator = name, Value = value) %>%
+  mutate(
+    Indicator = case_when(
+      Indicator == "AvgSalesPriceIdx" ~ "Avg sales price",
+      Indicator == "AvgDispIncomeIdx" ~ "Avg disposable income",
+      Indicator == "GDPIdx" ~ "National GDP"
+    )
+  )
 
 
 # Exporting the data for further analysis ====

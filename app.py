@@ -32,6 +32,8 @@ price_fit_metrics = pd.read_parquet("Output data/SalesModelFitMetrics.parquet")
 price_imp_metrics = pd.read_parquet(
     "Output data/SalesPriceImputationFitMetrics.parquet"
 )
+indexed_development = pd.read_parquet("Output data/IndexedDevelopment.parquet")
+
 
 # Getting macroeconomic data the assumptions are based on
 macro_data = pd.read_parquet("Temp data/MacroDataIMF.parquet")
