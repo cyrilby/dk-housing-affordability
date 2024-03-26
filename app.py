@@ -4,7 +4,7 @@ Streamlit app backbone
 ======================
 
 Author: kirilboyanovbg[at]gmail.com
-Last meaningful update: 22-03-2024
+Last meaningful update: 26-03-2024
 
 =======================================
 Things that will be useful to dig into:
@@ -151,6 +151,7 @@ options = st.sidebar.radio(
         "Pricing by municipality",
         "Affordability by municipality",
         "Affordability by gender",
+        "Indexed developments",
         "Info on data sources",
         "Info on modelling",
     ],
@@ -718,6 +719,99 @@ def page_afford_by_mncp_gen(df):
         terms of employment status, working hours or type of job held by men and
         women. The income levels used in the affordability calculations are annual 
         averages for both genders.
+        """
+    )
+
+
+# %% Page: Indexed developments [WIP as of 26-03-2024]
+
+
+def page_indexed_dev(df):
+    st.header("Indexed developments in pricing and income")
+
+    # Detecting and confirming slicer selections
+    n_years = filter_by_year(annual_recency)
+    price_types = filter_price_type_new(
+        price_type_combinations, "Historical data incl. estimates"
+    )
+    selected_loc = filter_by_single_location(df, "Municipality", "København")
+    st.write(
+        f"""This page shows the indexed developments in average sales price,
+        local disposable income and national GDP during the last {n_years}.
+        As such, it allows for comparisons between how much the price of housing
+        has increased relative to the increase in local disposable income and
+        relative to the growth of the national economy. Please use the
+        filters in the sidebar to adjust what data is shown on the chart,
+        including whether to **display predictions** for the next few years."""
+    )
+
+    # Filtering the data
+    data_to_display = df[df["Recency"] <= n_years].copy()
+    data_to_display = data_to_display[data_to_display["Municipality"] == selected_loc]
+    data_to_display = data_to_display[
+        data_to_display["PriceType"].isin(price_types)
+    ].copy()
+
+    # Sorting and cleaning up
+    data_to_display.sort_values("Year", ascending=False, inplace=True)
+    data_to_display.reset_index(inplace=True, drop=True)
+
+    # Rounding all relevant metrics off to 2 decimals
+    for metric in [
+        "AvgSalesPriceIdx",
+        "AvgDispIncomeIdx",
+        "GDPIdx",
+    ]:
+        data_to_display[metric] = np.round(data_to_display[metric], 2)
+
+    # Getting the name of the municipality selected by the user
+    selected_mncp = data_to_display["Municipality"].iloc[0]
+
+    # Create a trace for the first variable
+    trace1 = go.Scatter(
+        x=data_to_display["Year"],
+        y=data_to_display["AvgSalesPriceIdx"],
+        mode="lines",
+        name="Average sales price",
+    )
+
+    # Create a trace for the second variable
+    trace2 = go.Scatter(
+        x=data_to_display["Year"],
+        y=data_to_display["AvgDispIncomeIdx"],
+        mode="lines",
+        name="Avg disposable income",
+    )
+
+    # Create a trace for the second variable
+    trace3 = go.Scatter(
+        x=data_to_display["Year"],
+        y=data_to_display["GDPIdx"],
+        mode="lines",
+        name="National GDP",
+    )
+
+    # Create a layout
+    layout = go.Layout(
+        title="Indexed sales price, local disposable income and national GDP over time",
+        xaxis=dict(title="Year"),
+        yaxis=dict(title="Indexed value of indicators"),
+    )
+
+    # Create a figure and add the traces
+    fig = go.Figure(data=[trace1, trace2, trace3], layout=layout)
+    fig.update_traces(textposition="top center")
+    st.plotly_chart(fig)
+
+    # Displaying more details about how to use the chart
+    st.markdown("**Please note that:**")
+    st.write(
+        """
+        1) The values presented are indexed based on their 1992 values.
+        This also includes estimated sales prices for some municipalities
+        in order to show a complete historical record. Predictions can also
+        be included by selecting the relevant price type from the filter in
+        the app's sidebar.
         """
     )
 
@@ -1414,6 +1508,8 @@ elif options == "Affordability by municipality":
     page_afford_by_mncp(sales_data)
 elif options == "Affordability by gender":
     page_afford_by_mncp_gen(sales_data)
+elif options == "Indexed developments":
+    page_indexed_dev(indexed_development)
 elif options == "Info on data sources":
     page_notes_data()
 elif options == "Info on modelling":

@@ -136,6 +136,7 @@ the sales prices.
 IndexedDevelopment <- FinalSalesAndIncome %>%
   select(Year,
          Municipality,
+         PriceType,
          AvgSalesPriceIdx,
          AvgDisposableIncomeTotal)
 
@@ -169,19 +170,6 @@ IndexedDevelopment <- IndexedDevelopment %>%
          -BaseGDP,
          -GDP,
          -AvgDisposableIncomeTotal)
-
-
-# Converting the df into the long format (easier to plot in plotly)
-IndexedDevelopment <- IndexedDevelopment %>%
-  pivot_longer(cols = c("AvgSalesPriceIdx", "AvgDispIncomeIdx", "GDPIdx")) %>%
-  rename(Indicator = name, Value = value) %>%
-  mutate(
-    Indicator = case_when(
-      Indicator == "AvgSalesPriceIdx" ~ "Avg sales price",
-      Indicator == "AvgDispIncomeIdx" ~ "Avg disposable income",
-      Indicator == "GDPIdx" ~ "National GDP"
-    )
-  )
 
 
 # Exporting the data for further analysis ====
