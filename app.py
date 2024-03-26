@@ -84,6 +84,8 @@ annual_recency = dict(zip(unique_years, n_possible_years))
 # Mapping annual recency in all relevant datasets
 sales_data["Recency"] = sales_data["Year"].map(annual_recency)
 sales_data["Recency"] = sales_data["Recency"].fillna(0)
+indexed_development["Recency"] = indexed_development["Year"].map(annual_recency)
+indexed_development["Recency"] = indexed_development["Recency"].fillna(0)
 
 # Defining a custom set of price type combinations to show in slicer
 price_type_combinations = [
