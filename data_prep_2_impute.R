@@ -21,11 +21,6 @@ library(filesstrings)
 library(missForest)
 library(corrr)
 
-# Specifying local storage folder
-AnalysisFolder <-
-  "C:/Users/Documents/Hsng prices/"
-setwd(AnalysisFolder)
-
 
 # Custom function to impute/predict disposable income ====
 

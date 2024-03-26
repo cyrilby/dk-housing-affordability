@@ -19,11 +19,6 @@ library(zoo)
 library(stringr)
 library(filesstrings)
 
-# Specifying local storage folder
-AnalysisFolder <-
-  "C:/Users/Documents/Hsng prices/"
-setwd(AnalysisFolder)
-
 # Specifying uppercase spellings in the data to be corrected
 SpellingToFix = c("FAST EJENDOM I ALT")
 
