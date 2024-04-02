@@ -1,7 +1,7 @@
 # Data preparation for further analysis (part 1 of 4)
 
 # Author: kirilboyanovbg[at]gmail.com
-# Last meaningful update: 21-03-2024
+# Last meaningful update: 02-04-2024
 
 # In this script, we import data from different sources and perform some
 # clean-up that allows us to later integrate the data into a single dataset,
@@ -184,7 +184,7 @@ OwnFlatSales <- OwnFlatSales %>%
 
 # Reading file exported from DST
 PersonalIncomeAfterTax <-
-  read_excel(paste(AnalysisFolder, "Input data/INDKP101.xlsx", sep = ""),
+  read_excel("Input data/INDKP101.xlsx",
              skip = 2)
 
 # Repairing column names
@@ -271,7 +271,7 @@ iteration.
 
 # Reading file exported from DST
 IncomeBracketsAfterTax <-
-  read_excel(paste(AnalysisFolder, "Input data/INDKP106 - indkomst.xlsx", sep = ""),
+  read_excel("Input data/INDKP106 - indkomst.xlsx",
              skip = 2)
 
 # Repairing column names
@@ -314,7 +314,7 @@ IncomeBracketsAfterTax_Wide <- IncomeBracketsAfterTax %>%
 
 # Reading file exported from DST
 HouseholdIncomeAfterTax <-
-  read_excel(paste(AnalysisFolder, "Input data/INDKF132.xlsx", sep = ""),
+  read_excel("Input data/INDKF132.xlsx",
              skip = 2)
 
 # Repairing column names
@@ -402,7 +402,7 @@ HouseholdIncomeAfterTax_Wide <- HouseholdIncomeAfterTax_Wide %>%
 
 # Reading file exported from DST
 WealthRealEstate <-
-  read_excel(paste(AnalysisFolder, "Input data/EJDFOE1.xlsx", sep = ""),
+  read_excel("Input data/EJDFOE1.xlsx",
              skip = 2)
 
 # Repairing column names
@@ -499,7 +499,7 @@ WealthRealEstate_Wide <- WealthRealEstate %>%
 
 # Reading file exported from DST
 NationalEconomy <-
-  read_excel(paste(AnalysisFolder, "Input data/NAN1.xlsx", sep = ""), skip = 2)
+  read_excel("Input data/NAN1.xlsx", skip = 2)
 
 # Repairing column names
 ColNames <- names(NationalEconomy)

@@ -105,9 +105,9 @@ new_col_names = {
     "PctAccuracy_Total": "Total income, Accuracy (%)",
     "PctAccuracy_Men": "Male income, Accuracy (%)",
     "PctAccuracy_Women": "Female income, Accuracy (%)",
-    "ModelR2_SalesPrice": "Sales price, R² (%)",  # CONSIDER RENAMING IN R
-    "ModelMAPE_SalesPrice": "Sales price, MAPE (%)",  # CONSIDER RENAMING IN R
-    "PctAccuracy_SalesPrice": "Sales price, Accuracy (%)",  # CONSIDER RENAMING IN R
+    "ModelR2_SalesPrice": "Sales price, R² (%)",
+    "ModelMAPE_SalesPrice": "Sales price, MAPE (%)",
+    "PctAccuracy_SalesPrice": "Sales price, Accuracy (%)",
     "VariableName": "Variable name",
     "ModelMSE": "Mean squared error (MSE)",
     "MeanValue": "Mean value",
@@ -156,6 +156,7 @@ options = st.sidebar.radio(
         "Indexed developments",
         "Info on data sources",
         "Info on modelling",
+        "Legal disclaimer",
     ],
 )
 
@@ -286,9 +287,11 @@ def show_homepage():
     )
     # Note: image sourced from https://pixabay.com/photos/canal-copenhagen-christianshavn-2395818/
     st.image("Resources/app_image.jpg")
+
+    # Displaying more info on how the app can help the user
     st.subheader("How this app can help you", divider="rainbow")
     st.markdown(
-        """This focuses on both the sales price of apartments and their affordability
+        """This app focuses on both the sales price of apartments and their affordability
         (measured in terms of its relation to personal income). The focus in here is on
         the so-called "owned apartments" (called *ejerbolig* in Danish).
         """
@@ -312,13 +315,8 @@ def show_homepage():
         """
     )
 
-    # WIP: add cards with links that help answer different questions (optional)
-
+    # Displaying more info on how to use the app
     st.subheader("How to use this app", divider="rainbow")
-    # st.warning("Text will be added later on...")
-    # WIP: Add something related to how to switch between pages as well as how
-    # to use filters on the different pages + mention the documentation on
-    # the last page.
     st.markdown("This app consists of the following two panes:")
     st.markdown(
         """
@@ -335,6 +333,7 @@ def show_homepage():
     st.image("Resources/pages_examples.PNG")
     st.markdown("You will then be redirected to the desired page.")
 
+    # Displaying more info on how the user can filter the data
     st.subheader("How to apply filters to the data", divider="rainbow")
     st.markdown(
         """To **apply a filter to the data**, please click on the filter
@@ -1203,17 +1202,16 @@ def page_notes_data():
     st.header("Data collection & method")
     st.markdown(
         """This page provides background information on where the data
-                presented in this app comes from originally as well as what kind
-                of transformations the data is subjected to before it is loaded
-                in the app."""
+        presented in this app comes from originally as well as what kind
+        of transformations the data is subjected to before it is loaded
+        in the app.
+        """
     )
-
-    # TO-DO's:
-    # 1) Show information on each data source: which variables are sourced
-    # from there, what period is covered, how often/when the data is updated.
-    # 2) Reg. the macroeconomic indicators, show some charts with the values
-    # of GDP, annual inflation and median interest rate across time. This again
-    # in an effort to improve transparency.
+    st.markdown(
+        """Please note that all price-related numbers used throughout
+        the app are in Denmark's official currency, the **Danish krone (DKK)**.
+        """
+    )
 
     st.subheader("Data on sales prices", divider="rainbow")
     st.markdown(
@@ -1495,6 +1493,48 @@ def page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics
     )
 
 
+# %% Compulsory legal disclaimer
+
+
+def page_legal():
+    st.header("Legal disclaimer")
+    st.markdown(
+        """
+    This application is intended for educational purposes only and is designed to 
+    benefit the general public.
+    
+    **By using this application, you acknowledge and agree to the following terms**:
+                
+    1. The app **gives an insight** into the development in the sales price of
+    so-called "owned apartments" (*ejerbolig* in Danish) and local disposable
+    income in each municipality, using the two to derive a metric of housing
+    affordability.
+    2. The intent of the author is to **empower the general public** (which 
+    suffers as a direct consquence of rising unaffordability) and **decision-makers**
+    (who may take measures to make housing more affordable for the average resident).
+    3. Due to the nature of the data, which is not always available in the source
+    and which is subjected to aggregation in connection with this app, the numbers
+    provided in here are **approximations rather than 100% exact numbers**.
+    4. The author **does not claim ownership** for any of the input data used in the
+    app, the sources of which are credited on the "Info on data sources" page.
+    5. The numbers generated in the subsequent data processing and modelling,
+    including imputed values of historical sales prices as well as predictions
+    for future sales price may be **distributed further** only by referencing
+    this app and its author.
+    6. The data and insights provided by this application are **not intended for
+    commercial use**.
+    7. While every effort has been made to ensure the accuracy and reliability of
+    the data, the creator of this application **does not guarantee** the accuracy,
+    completeness, or suitability of the data for any particular purpose.
+    8. The creator **shall not be held liable for** any loss, damage,
+    or inconvenience arising as a consequence of any use of or the inability to
+    use any information provided by this application.
+
+    These terms were last revised on 02 April 2024.
+"""
+    )
+
+
 # %% Allowing the user to switch between pages in the app
 
 # Based on the page selected by the end user
@@ -1516,3 +1556,5 @@ elif options == "Info on data sources":
     page_notes_data()
 elif options == "Info on modelling":
     page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics)
+elif options == "Legal disclaimer":
+    page_legal()
