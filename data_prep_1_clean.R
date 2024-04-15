@@ -1,7 +1,7 @@
 # Data preparation for further analysis (part 1 of 4)
 
 # Author: kirilboyanovbg[at]gmail.com
-# Last meaningful update: 02-04-2024
+# Last meaningful update: 15-04-2024
 
 # In this script, we import data from different sources and perform some
 # clean-up that allows us to later integrate the data into a single dataset,
@@ -179,7 +179,7 @@ OwnFlatSales <- OwnFlatSales %>%
   select(PostCode, Location, YearQuarter, Year, Quarter, NumberOfSales)
 
 
-# Personal disposable income by quarter and municipality ====
+# Personal disposable income by year and municipality ====
 # Source: DST (Table: INDKP101)
 
 # Reading file exported from DST
@@ -667,8 +667,7 @@ MacroDataIMF <- MacroDataIMF %>%
 MacroDataIMF <- MacroDataIMF %>%
   mutate(
     VarnameForPivot = case_when(
-      Varname == "Gross domestic product, constant prices_National currency" ~ "GDP",
-      Varname == "Gross domestic product, constant prices_Percent change" ~ "GDP_PctChange",
+      Varname == "Gross domestic product, current prices_National currency" ~ "GDP",
       Varname == "Inflation, average consumer prices_Index" ~ "AvgInflation",
       Varname == "Inflation, average consumer prices_Percent change" ~ "AvgInflation_PctChange",
       Varname == "Inflation, end of period consumer prices_Index" ~ "AnnualInflation",

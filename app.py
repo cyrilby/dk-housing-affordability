@@ -4,7 +4,7 @@ Streamlit app backbone
 ======================
 
 Author: kirilboyanovbg[at]gmail.com
-Last meaningful update: 26-03-2024
+Last meaningful update: 15-04-2024
 
 =======================================
 Things that will be useful to dig into:
@@ -1209,7 +1209,11 @@ def page_notes_data():
     )
     st.markdown(
         """Please note that all price-related numbers used throughout
-        the app are in Denmark's official currency, the **Danish krone (DKK)**.
+        the app are in Denmark's official currency, the **Danish krone (DKK)**
+        and that all prices are of the **"current" type**, that is, they are not
+        adjusted for the effects of inflation over time. This is done to ensure
+        that the data points are directly comparable and that the numbers are
+        identical to those used in the source.
         """
     )
 
