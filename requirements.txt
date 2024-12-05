@@ -1,7 +1,6 @@
-numpy
-pandas
-seaborn
-statsmodels
-geopandas
-plotly
-plotly-express
+numpy==1.26.0
+pandas==2.2.2
+seaborn==0.12.2
+statsmodels==0.13.5
+geopandas==0.12.2
+plotly==5.20.0
