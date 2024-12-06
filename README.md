@@ -1,9 +1,11 @@
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://dk-housing.streamlit.app/)
+[![MindGraph](https://img.shields.io/badge/Product%20of%20-MindGraph.dk-1ea2b5?logo=https://mindgraph.dk/favicon.png")](https://mindgraph.dk)
 
 # DK housing affordability
 
-- Author: kirilboyanovbg[at]gmail.com
-- Last meaningful update: 22-03-2024
+* Author: Kiril (GitHub@cyrilby)
+* Website: [mindgraph.dk](https://mindgraph.dk)
+* Last meaningful update: 22-03-2024
 
 This repository contains `R` and `Python` code designed to collect, clean and visualize data on housing prices in Denmark. The output of the process is a Streamlit app, which gives users an insight into what sales prices of apartments in different Danish municipalities look like and how affordable buying a flat is.
 
