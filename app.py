@@ -4,12 +4,7 @@ Streamlit app backbone
 ======================
 
 Author: kirilboyanovbg[at]gmail.com
-Last meaningful update: 15-04-2024
-
-=======================================
-Things that will be useful to dig into:
-=======================================
-> Fix the pop-labels shown on charts to have some more user-friendly names
+Last meaningful update: 03-04-2025
 """
 
 # %% Setting things up
@@ -20,7 +15,6 @@ import numpy as np
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
-import geopandas as gpd
 
 
 # %% Importing data for use in the app
