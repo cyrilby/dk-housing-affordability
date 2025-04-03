@@ -257,12 +257,26 @@ def filter_fit_metrics(default_val):
     return selected_metrics
 
 
+# Setting up a function that adds the MindGraph logo
+def add_logo():
+    """
+    Adds the MindGraph logo to the upper left corner of the page.
+    """
+    st.logo(
+        "https://mindgraph.dk/logo.svg",
+        size="large",
+        link="https://mindgraph.dk",
+        icon_image="https://mindgraph.dk/favicon.svg",
+    )
+
+
 # %% Page: Welcome to the app
 
 
 # Informs the user of the app's purpose and the selected metric for N of employees
 def show_homepage():
     st.header("Welcome to the DK housing affordability app!")
+    add_logo()
     st.markdown(
         """
         This app is designed to give you an insight into what **sales prices** of apartments
@@ -359,6 +373,7 @@ def show_homepage():
 
 def page_avg_by_mncp(df):
     st.header("Housing prices by municipality and year")
+    add_logo()
 
     # Detecting and confirming slicer selections
     n_years = filter_by_year(annual_recency)
@@ -448,7 +463,7 @@ def page_avg_by_mncp(df):
         2) Prices shown for each municipality are based on an annual weighted
         average, calculated based on sales in different post code areas. Some
         rounding off errors may persist.
-       """
+        """
     )
     st.markdown(
         """
@@ -473,6 +488,7 @@ def page_avg_by_mncp(df):
 
 def page_afford_by_mncp(df):
     st.header("Affordability by municipality and year")
+    add_logo()
 
     # Detecting and confirming slicer selections
     n_years = filter_by_year(annual_recency)
@@ -564,7 +580,7 @@ def page_afford_by_mncp(df):
         2) Prices for each municipality are based on an annual weighted
         average, calculated based on sales in different post code areas. Some
         rounding off errors may persist.
-       """
+        """
     )
     st.write(
         """
@@ -582,6 +598,7 @@ def page_afford_by_mncp(df):
 
 def page_afford_by_mncp_gen(df):
     st.header("Affordability by municipality, gender and year")
+    add_logo()
 
     # Detecting and confirming slicer selections
     n_years = filter_by_year(annual_recency)
@@ -690,7 +707,7 @@ def page_afford_by_mncp_gen(df):
         2) Prices for each municipality are based on an annual weighted
         average, calculated based on sales in different post code areas. Some
         rounding off errors may persist.
-       """
+        """
     )
     st.write(
         """
@@ -711,11 +728,12 @@ def page_afford_by_mncp_gen(df):
     )
 
 
-# %% Page: Indexed developments [WIP as of 26-03-2024]
+# %% Page: Indexed developments
 
 
 def page_indexed_dev(df):
     st.header("Indexed developments in pricing and income")
+    add_logo()
 
     # Detecting and confirming slicer selections
     n_years = filter_by_year(annual_recency)
@@ -751,9 +769,6 @@ def page_indexed_dev(df):
         "GDPIdx",
     ]:
         data_to_display[metric] = np.round(data_to_display[metric], 2)
-
-    # Getting the name of the municipality selected by the user
-    selected_mncp = data_to_display["Municipality"].iloc[0]
 
     # Create a trace for the first variable
     trace1 = go.Scatter(
@@ -809,13 +824,7 @@ def page_indexed_dev(df):
 
 def page_annual_price_overview(df):
     st.header("Overview of housing prices")
-    # st.warning(
-    #     """WIP as of 20-03-2024: I'm testing a new chart that shows
-    #            a map of Denmark with the different municipalities coloured
-    #            to represent the average price per M2. Currently, this is not
-    #            working as expected, so I've disabled it until the code is fixed.
-    #            """
-    # )
+    add_logo()
 
     # Detecting and confirming slicer selections
     possible_years = (
@@ -972,6 +981,7 @@ def page_annual_price_overview(df):
 
 def page_annual_afford_overview(df):
     st.header("Overview of housing affordability")
+    add_logo()
 
     # Detecting and confirming slicer selections
     possible_years = (
@@ -1166,6 +1176,7 @@ def page_annual_afford_overview(df):
 
 def page_notes_data():
     st.header("Data collection & method")
+    add_logo()
     st.markdown(
         """This page provides background information on where the data
         presented in this app comes from originally as well as what kind
@@ -1270,6 +1281,7 @@ def page_notes_data():
 
 def page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics):
     st.header("Info on model accuracy & method")
+    add_logo()
     st.markdown(
         """The data presented in this app has been subjected to **several
         different models** in order for the app to be able to show e.g.
@@ -1414,9 +1426,8 @@ def page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics
         ]
     elif selected_metrics == "R² only":
         st.warning(
-            """Note: R² is not available for this model. Please select
-                   a different metric to show.
-                   """
+            """Note: R² is not available for this model. Please select a different metric to show.
+            """
         )
     elif selected_metrics == "MAPE/RMSE only":
         allowed_metrics = ["Normalized RMSE (%)"]
@@ -1467,6 +1478,7 @@ def page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics
 
 def page_legal():
     st.header("Legal disclaimer")
+    add_logo()
     st.markdown(
         """
     This application is intended for educational purposes only and is designed to 
