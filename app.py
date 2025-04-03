@@ -42,13 +42,6 @@ interest_rate = interest_rate[["Year", "MedianInterestRate"]]
 macro_data = pd.merge(macro_data, interest_rate, how="left", on="Year")
 med_int = interest_rate["MedianInterestRate"].iloc[-1]
 
-# Load GeoJSON data on Danish municipalities
-geo_data = gpd.read_file("Resources/Danish municipalities.geojson")
-geo_data = geo_data.rename(columns={"label_dk": "Municipality"})
-geo_data = geo_data[["Municipality", "geometry"]]
-geo_data = geo_data.drop_duplicates(subset="Municipality")
-geo_data = geo_data.reset_index(drop=True)
-
 # Getting the latest year with actual sales data
 last_historical_year = sales_data[sales_data["PriceType"] != "Predicted price"][
     "Year"
@@ -860,34 +853,13 @@ def page_annual_price_overview(df):
         data_to_display[metric_for_use] = np.round(data_to_display[metric_for_use], 2)
         metric_for_use_txt = "Average price per m² (indexed)"
 
-    # # Preparing data for geo plot
-    # data_selected_year = data_to_display[
-    #     data_to_display["PriceType"] == year_to_show
-    # ].copy()
-    # data_selected_year = data_selected_year[
-    #     data_selected_year["Municipality"] != "National average"
-    # ].copy()
-    # # data_selected_year = pd.merge(
-    # #    data_selected_year, geo_data, how="left", on="Municipality"
-    # # )
-
-    # # ============================================================
-    # # Plotting a map of average sales prices for the selected year
-    # # ============================================================
-
-    # # Creating a choropleth map and adjusting its settings
-    # fig0 = px.choropleth(
-    #     data_selected_year.reset_index(),
-    #     geojson=geo_data.__geo_interface__,
-    #     locations="Municipality",
-    #     color=metric_for_use,
-    #     featureidkey="properties.Municipality",
-    #     projection="mercator",
-    # )
-    # fig0.update_geos(
-    #     showcountries=True, showcoastlines=True, showland=True, fitbounds="locations"
-    # )
-    # st.plotly_chart(fig0)
+    # Preparing data for geo plot
+    data_selected_year = data_to_display[
+        data_to_display["PriceType"] == year_to_show
+    ].copy()
+    data_selected_year = data_selected_year[
+        data_selected_year["Municipality"] != "National average"
+    ].copy()
 
     # ===================================================================
     # Plotting historical development of the national average sales price
@@ -1275,9 +1247,8 @@ def page_notes_data():
     )
     st.markdown(
         """
-        - The data covers the period 1980-2028, where historical data
-        is used until the end of 2022 and where official estimates
-        predictions are used for the remaining time periods.
+        - The data covers the period from 1980 onward, including both historical
+        data and predictions for the upcoming 5 years.
         - The data used specifically in this app are the *Gross domestic 
         product* measured in constant prices as well as *Inflation, end of
         period* measured in consumer prices.
