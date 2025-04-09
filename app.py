@@ -850,9 +850,16 @@ def page_hist_changes(df):
     st.header("Historical changes across municipalities")
     add_logo()
 
+    # For showing side-by-side price changes, we need prices
+    # including estimates to ensure we always have data to show
+    local_price_combinations = [
+        "Historical data incl. estimates",
+        "Historical data and predictions",
+    ]
+
     # Detecting and confirming slicer selections
     price_types = filter_price_type_new(
-        price_type_combinations, "Historical data incl. estimates"
+        local_price_combinations, "Historical data incl. estimates"
     )
     if "Predicted price" in price_types:
         ref_year = filter_by_year_ref(unique_years, future_years)
@@ -928,7 +935,7 @@ def page_hist_changes(df):
     ]
     values = [
         f"Decrease in {txt_for_title}",
-        data_to_display["% change"] == f"No change in {txt_for_title}",
+        f"No change in {txt_for_title}",
         f"Increase in {txt_for_title}",
     ]
     data_for_chart["Change type"] = np.select(conditions, values)
@@ -1001,8 +1008,9 @@ def page_hist_changes(df):
         """
         3) We don't necessarily have data for all municipalities for all yeas,
         which is why some of the prices shown on the chart may be estimates rather
-        than actual prices. Please use the *Selected price type(s)* filter in the 
-        sidebar if you only wish to look at actual sales prices.
+        than actual prices. Unlike on most other pages, filtering out estimated
+        prices is not possible here, because it may mean we don't have enough data
+        to show the comparisons.
         """
     )
 
