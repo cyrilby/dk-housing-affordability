@@ -928,15 +928,16 @@ def page_hist_changes(df):
 
     # Aggregating municipalities based on change type
     data_for_chart = data_to_display.reset_index().copy()
+    n_rows = len(data_for_chart)
     conditions = [
         data_for_chart["% change"] < 0,
         data_for_chart["% change"] == 0,
         data_for_chart["% change"] > 0,
     ]
     values = [
-        f"Decrease in {txt_for_title}",
-        f"No change in {txt_for_title}",
-        f"Increase in {txt_for_title}",
+        n_rows * [f"Decrease in {txt_for_title}"],
+        n_rows * [f"No change in {txt_for_title}"],
+        n_rows * [f"Increase in {txt_for_title}"],
     ]
     data_for_chart["Change type"] = np.select(conditions, values)
     data_for_chart = data_for_chart[
