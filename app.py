@@ -141,6 +141,7 @@ options = st.sidebar.radio(
         "Affordability by municipality",
         "Affordability by gender",
         "Indexed developments",
+        "Historical changes",
         "Info on data sources",
         "Info on modelling",
         "Legal disclaimer",
@@ -179,6 +180,29 @@ def filter_by_year(list_of_years):
         "Selected number of past years (up to)",
         list_of_years.values(),
         value=np.max(list(list_of_years.values())),
+    )
+    return selected_years
+
+
+# Setting up sidebar filters for baseline and reference years
+def filter_by_year_base(hist_years, future_years):
+    all_years = hist_years + future_years
+    all_years.sort()
+    selected_years = st.sidebar.selectbox(
+        "Selected baseline year",
+        all_years,
+        index=all_years.index(np.min(hist_years)),
+    )
+    return selected_years
+
+
+def filter_by_year_ref(hist_years, future_years):
+    all_years = hist_years + future_years
+    all_years.sort()
+    selected_years = st.sidebar.selectbox(
+        "Selected reference year",
+        all_years,
+        index=all_years.index(np.max(hist_years)),
     )
     return selected_years
 
@@ -815,6 +839,170 @@ def page_indexed_dev(df):
         in order to show a complete historical record. Predictions can also
         be included by selecting the relevant price type from the filter in
         the app's sidebar.
+        """
+    )
+
+
+# %% Page: Historical changes across municipalities"
+
+
+def page_hist_changes(df):
+    st.header("Historical changes across municipalities")
+    add_logo()
+
+    # Detecting and confirming slicer selections
+    price_types = filter_price_type_new(
+        price_type_combinations, "Historical data incl. estimates"
+    )
+    if "Predicted price" in price_types:
+        ref_year = filter_by_year_ref(unique_years, future_years)
+        base_year = filter_by_year_base(unique_years, future_years)
+    else:
+        ref_year = filter_by_year_ref(unique_years, [])
+        base_year = filter_by_year_base(unique_years, [])
+    relevant_years = [base_year, ref_year]
+    metric_for_use = filter_metric(
+        [
+            "Actual price",
+            "Buyable m² with annual income",
+            "Years of income to buy 50 m²",
+        ]
+    )
+    st.write(
+        f"""This page summarizes the changes in housing prices/housing
+        affordability across municipalities between {base_year}-{ref_year}.
+        Please use the filters in the sidebar to adjust what data is shown in the
+        table, including whether to **take predictions into account** when
+        calculating the changes."""
+    )
+
+    # Filtering the data
+    data_to_display = df[df["Year"].isin(relevant_years)].copy()
+    data_to_display = data_to_display[
+        data_to_display["PriceType"].isin(price_types)
+    ].copy()
+
+    # Sorting and cleaning up
+    data_to_display.sort_values(["Municipality", "Year"], ascending=False, inplace=True)
+    data_to_display.reset_index(inplace=True, drop=True)
+
+    # Pivoting the data based on year
+    data_to_display = data_to_display.pivot(
+        index="Municipality", columns="Year", values=metric_for_use
+    )
+
+    # Calculating rate of change in the selected metric
+    data_to_display["% change"] = (
+        data_to_display[ref_year] - data_to_display[base_year]
+    ) / data_to_display[base_year]
+    data_to_display["% change"] = np.round(100 * data_to_display["% change"], 1)
+
+    # Rounding off numbers before displaying the dataframe
+    if metric_for_use == "AvgSalesPrice":
+        for col in [base_year, ref_year]:
+            data_to_display[col] = data_to_display[col].round(0).astype(int)
+    else:
+        for col in [base_year, ref_year]:
+            data_to_display[col] = data_to_display[col].round(1)
+
+    # Preparing string for displaying as a title of the table
+    if metric_for_use == "AvgSalesPrice":
+        txt_for_title = "actual price"
+        txt_short = "price"
+    elif metric_for_use == "M2AffordedTotal":
+        txt_for_title = "buyable m² with annual income"
+        txt_short = "affordability"
+    elif metric_for_use == "YearsoBuy50M2Total":
+        txt_for_title = "years of income to buy 50 m²"
+        txt_short = "affordability"
+    else:
+        txt_for_title = "invalid selection"
+        txt_short = "invalid selection"
+
+    # Aggregating municipalities based on change type
+    data_for_chart = data_to_display.reset_index().copy()
+    conditions = [
+        data_to_display["% change"] < 0,
+        data_to_display["% change"] == 0,
+        data_to_display["% change"] > 0,
+    ]
+    values = [
+        f"Decrease in {txt_for_title}",
+        data_to_display["% change"] == f"No change in {txt_for_title}",
+        f"Increase in {txt_for_title}",
+    ]
+    data_for_chart["Change type"] = np.select(conditions, values)
+    data_for_chart = data_for_chart[
+        data_for_chart["Municipality"] != "National average"
+    ].copy()
+    data_for_chart["Number of municipalities"] = data_for_chart.groupby("Change type")[
+        "Municipality"
+    ].transform("nunique")
+    data_for_chart = data_for_chart.drop_duplicates("Change type")
+    cols_to_keep = ["Change type", "Number of municipalities"]
+    data_for_chart = data_for_chart[cols_to_keep]
+
+    # =============================================
+    # Showing overall insights based on change type
+    # =============================================
+    st.subheader(f"Overall changes in {txt_short}", divider="rainbow")
+    st.write(
+        f"""
+            The chart below shows the number of municipalities that have
+            seen either an increase/decrease in {txt_for_title}:"""
+    )
+
+    # Creating a doughnut chart with the split by change type
+    chart = px.pie(
+        data_for_chart,
+        values="Number of municipalities",
+        names="Change type",
+        hole=0.45,
+    )
+    chart.update_layout(
+        title_text=f"Number of municipalities split by type of change in {txt_for_title}",
+        legend_title="",
+    )
+    st.plotly_chart(chart)
+
+    # ==============================================
+    # Showing detailed numbers for each municipality
+    # ==============================================
+    st.subheader(f"Changes in {txt_short} by municipality", divider="rainbow")
+    st.write(
+        f"""
+            The **table** at the bottom shows data on {txt_for_title} in the
+            selected baseline and reference (comparison) years, as well as the
+            change between the two years measured in percentage terms:"""
+    )
+
+    # Displaying the full dataframe with all municipalities
+    st.markdown(f"**Changes in {txt_for_title} between {base_year}-{ref_year}**")
+    st.dataframe(data_to_display, use_container_width=True)
+
+    # Displaying more details about how to use the chart
+    st.markdown("**Please note that:**")
+    st.write(
+        """
+        1) By default, the calculations nare based on actual sales prices per m²
+        but you can also choose to focus on the two metrics of housing affordability
+        seen throughout the rest of the app. To do so, use the 'Metric to show'
+        filter in the sidebar.
+        """
+    )
+    st.write(
+        """
+        2) Prices shown for each municipality are based on an annual weighted
+        average, calculated based on sales in different post code areas. Some
+        rounding off errors may persist.
+        """
+    )
+    st.markdown(
+        """
+        3) We don't necessarily have data for all municipalities for all yeas,
+        which is why some of the prices shown on the chart may be estimates rather
+        than actual prices. Please use the *Selected price type(s)* filter in the 
+        sidebar if you only wish to look at actual sales prices.
         """
     )
 
@@ -1509,9 +1697,10 @@ def page_legal():
     completeness, or suitability of the data for any particular purpose.
     8. The creator **shall not be held liable for** any loss, damage,
     or inconvenience arising as a consequence of any use of or the inability to
-    use any information provided by this application.
+    use any information provided by this application, including using the forecasted
+    future prices to make decisions about selling/purchasing flats in real life.
 
-    These terms were last revised on 02 April 2024.
+    These terms were last revised on 09 April 2025.
 """
     )
 
@@ -1533,6 +1722,8 @@ elif options == "Affordability by gender":
     page_afford_by_mncp_gen(sales_data)
 elif options == "Indexed developments":
     page_indexed_dev(indexed_development)
+elif options == "Historical changes":
+    page_hist_changes(sales_data)
 elif options == "Info on data sources":
     page_notes_data()
 elif options == "Info on modelling":
