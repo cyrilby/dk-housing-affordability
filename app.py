@@ -4,7 +4,7 @@ Streamlit app backbone
 ======================
 
 Author: kirilboyanovbg[at]gmail.com
-Last meaningful update: 03-04-2025
+Last meaningful update: 08-04-2025
 """
 
 # %% Setting things up
@@ -929,9 +929,9 @@ def page_hist_changes(df):
     # Aggregating municipalities based on change type
     data_for_chart = data_to_display.reset_index().copy()
     conditions = [
-        data_to_display["% change"] < 0,
-        data_to_display["% change"] == 0,
-        data_to_display["% change"] > 0,
+        data_for_chart["% change"] < 0,
+        data_for_chart["% change"] == 0,
+        data_for_chart["% change"] > 0,
     ]
     values = [
         f"Decrease in {txt_for_title}",
