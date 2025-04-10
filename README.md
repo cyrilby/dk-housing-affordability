@@ -7,11 +7,11 @@
 * Website: [mindgraph.dk](https://mindgraph.dk)
 * Last meaningful update: 10-04-2025
 
-This repository contains `R` and `Python` code designed to collect, clean and visualize data on housing prices in Denmark. The output of the process is a Streamlit app, which gives users an insight into what sales prices of apartments in different Danish municipalities look like and how affordable buying a flat is.
+This repository contains `R` and `Python` code designed to collect, clean and visualize data on housing prices in Denmark. The output of the process is a Streamlit app, which gives users an insight into what sales prices of flats in different Danish municipalities look like and how affordable buying a flat is.
 
 ## Use case scenarios
 
-The focus in here is on both the **sales price** of apartments and their **affordability** (measured in terms of its relation to personal income). The focus in here is on the so-called "owned apartments" (called *ejerbolig* in Danish).
+The focus in here is on both the **sales price** of flats and their **affordability** (measured in terms of its relation to personal income). The focus in here is on the so-called "owned flats" (called *ejerbolig* in Danish).
 
 **Using this app, you will be able to find answers to questions such as:**
 

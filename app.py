@@ -309,7 +309,7 @@ def show_homepage():
     add_logo()
     st.markdown(
         """
-        This app is designed to give you an insight into what **sales prices** of apartments
+        This app is designed to give you an insight into what **sales prices** of flats
         in different Danish municipalities look like and **how affordable** buying a flat is. All data on prices, GDP
         and income shown in the app is in *nominal prices*.
         """
@@ -323,9 +323,9 @@ def show_homepage():
     # Displaying more info on how the app can help the user
     st.subheader("How this app can help you", divider="rainbow")
     st.markdown(
-        """This app focuses on both the sales price of apartments and their affordability
+        """This app focuses on both the sales price of flats and their affordability
         (measured in terms of its relation to personal income). The focus in here is on
-        the so-called "owned apartments" (called *ejerbolig* in Danish).
+        the so-called "owned flats" (called *ejerbolig* in Danish).
         """
     )
     st.markdown(
@@ -537,7 +537,7 @@ def page_afford_by_mncp(df):
         the last {n_years} years. **Two metrics of affordablity** are presented: the
         number of m² that the average person can buy with their annual disposable
         income and the number of years of income it would take the average person
-        to buy a 50 m² apartment. You can **switch between** these two metrics as
+        to buy a 50 m² flat. You can **switch between** these two metrics as
         well as adjust the number of years or the municipalities shown on the chart
         by using the filters in the sidebar. From there, you can also choose to
         **display predictions** for the next few years."""
@@ -1046,8 +1046,8 @@ def page_annual_price_overview(df):
 
     st.write(
         """This page shows the development of the average sales price for
-        apartments in Denmark across time. In addition, it also shows the
-        most and least expensive municipalities to buy an apartment in."""
+        flats in Denmark across time. In addition, it also shows the
+        most and least expensive municipalities to buy an flat in."""
     )
 
     # Filtering the data
@@ -1133,7 +1133,7 @@ def page_annual_price_overview(df):
     st.markdown(
         """
                 The chart below shows the **most expensive** municipalities to buy
-                an apartment in as of the year selected by the user. Please use
+                an flat in as of the year selected by the user. Please use
                 the *Year* filter in the sidebar to look at a different period.
                 If you want to display a different number of municipalities than
                 the default, please use the *Number of top municipalities to show*
@@ -1174,7 +1174,7 @@ def page_annual_price_overview(df):
     st.markdown(
         """
                 The chart below shows the **least expensive** municipalities to buy
-                an apartment in as of the year selected by the user. Please use
+                an flat in as of the year selected by the user. Please use
                 the filters in the sidebar to adjust the data displayed on it.
                 """
     )
@@ -1243,7 +1243,7 @@ def page_annual_afford_overview(df):
     st.markdown(
         """
                 The chart below shows the **most affordable** municipalities to buy
-                an apartment in as of the year selected by the user. Please use
+                an flat in as of the year selected by the user. Please use
                 the filters in the sidebar to adjust the data displayed on it.
                 """
     )
@@ -1281,7 +1281,7 @@ def page_annual_afford_overview(df):
     st.markdown(
         """
                 The chart below shows the **least affordable** municipalities to buy
-                an apartment in as of the year selected by the user. Please use
+                an flat in as of the year selected by the user. Please use
                 the filters in the sidebar to adjust the data displayed on it.
                 """
     )
@@ -1329,9 +1329,9 @@ def page_annual_afford_overview(df):
     st.markdown(
         """*Note*: even though it's referred to as 'most positive
                 development', in reality, this **does not mean** that it's become
-                more affordable or cheaper to buy an apartment. In some cases,
+                more affordable or cheaper to buy an flat. In some cases,
                 this may even mean that relative to other municipalities, in the
-                ones shown on the chart, apartments have become less affordable
+                ones shown on the chart, flats have become less affordable
                 at a slower rate."""
     )
 
@@ -1692,7 +1692,7 @@ def page_legal():
     **By using this application, you acknowledge and agree to the following terms**:
                 
     1. The app **gives an insight** into the development in the sales price of
-    so-called "owned apartments" (*ejerbolig* in Danish) and local disposable
+    so-called "owned flats" (*ejerbolig* in Danish) and local disposable
     income in each municipality, using the two to derive a metric of housing
     affordability.
     2. The intent of the author is to **empower the general public** (which 
