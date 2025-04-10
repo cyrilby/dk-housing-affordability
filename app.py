@@ -4,7 +4,7 @@ Streamlit app backbone
 ======================
 
 Author: kirilboyanovbg[at]gmail.com
-Last meaningful update: 08-04-2025
+Last meaningful update: 10-04-2025
 """
 
 # %% Setting things up
@@ -12,9 +12,15 @@ Last meaningful update: 08-04-2025
 # Importing relevant packages
 import pandas as pd
 import numpy as np
+import datetime as dt
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
+
+# Getting current, previous and next year
+current_year = dt.datetime.now().year
+prev_year = current_year - 1
+next_year = current_year + 1
 
 
 # %% Importing data for use in the app
@@ -304,7 +310,8 @@ def show_homepage():
     st.markdown(
         """
         This app is designed to give you an insight into what **sales prices** of apartments
-        in different Danish municipalities look like and **how affordable** buying a flat is.
+        in different Danish municipalities look like and **how affordable** buying a flat is. All data on prices, GDP
+        and income shown in the app is in *nominal prices*.
         """
     )
     st.markdown(
@@ -1017,7 +1024,7 @@ def page_hist_changes(df):
     )
 
 
-# %% Page: annual price overview [WIP as of 22-03-2024: testing map chart]
+# %% Page: annual price overview
 
 
 def page_annual_price_overview(df):
@@ -1427,13 +1434,13 @@ def page_notes_data():
 
     st.subheader("Data on disposable income", divider="rainbow")
     st.markdown(
-        """Data on average disposable income by municipality is collected from the `INDKP106` table on [Danmarks Statistik (DST)](www.dst.dk)'s website.
+        """Data on average disposable income by municipality is collected from the `INDKP101` table on [Danmarks Statistik (DST)](www.dst.dk)'s website.
         """
     )
     st.markdown(
-        """
-        - The data comes in an annual format and spans across 1987-2022 as of
-        March 2024 (new data is added in November, quite a significant delay).
+        f"""
+        - The data comes in an annual format and spans across 1987-{prev_year - 1} (new data is added in November, 2
+        years after the fact, i.e. with quite a significant delay).
         - The data presents average disposable income in each municipality
         both in total but also divided by gender (male/female only).
         - It is furthermore possible to filter the data by age group and income
@@ -1453,7 +1460,7 @@ def page_notes_data():
         - The data covers the period from 1980 onward, including both historical
         data and predictions for the upcoming 5 years.
         - The data used specifically in this app are the *Gross domestic 
-        product* measured in constant prices as well as *Inflation, end of
+        product* measured in nominal prices as well as *Inflation, end of
         period* measured in consumer prices.
         """
     )
@@ -1496,9 +1503,9 @@ def page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics
     # Displaying background info on the predictions for disposable income
     st.subheader("Predictions for disposable income", divider="rainbow")
     st.markdown(
-        """DST provides data on disposable income with a **significant
-        delay**, for example, the data for 2023 will only be published in
-        November 2024. In addition, no data on **future disposable income**
+        f"""DST provides data on disposable income with a **significant
+        delay**, for example, the data for {prev_year} will only be published in
+        November {current_year}. In addition, no data on **future disposable income**
         is available in the source but as certain calculations depend on knowing 
         future income levels (e.g. future housing affordability),
         we need to generate predictions for future disposable income as well.
@@ -1555,7 +1562,7 @@ def page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics
         function of Denmark's national *GDP*, *annual inflation* and the annual
         *median interest rate* as reported by Denmark's national bank.
         * The **future values** of GDP and inflation are sourced from the IMF's
-        World Economic Outlook (published in October 2023), while for interest rate,
+        World Economic Outlook (published in April and October each year), while for interest rate,
         we use the all-time historical average of {med_int}%.
         * The **accuracy** of the model is then evaluated using the inverse of the
         mean absolute percentage error (**MAPE**) score, which shows by how much
