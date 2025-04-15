@@ -15,12 +15,43 @@ import numpy as np
 import datetime as dt
 import streamlit as st
 import plotly.express as px
-import plotly.graph_objects as go
+import plotly.io as pio
 
 # Getting current, previous and next year
 current_year = dt.datetime.now().year
 prev_year = current_year - 1
 next_year = current_year + 1
+
+
+# %% HTML and color customization
+
+# Creating a custom color palette with the MG colors
+# Using the "Classy" palette from: https://mycolor.space/?hex=%231EA2B5&sub=1
+my_custom_palette = ["#1ea2b5", "#324b4f", "#95b0b5", "#9f8ac3", "#6b588d"]
+my_template = pio.templates["plotly_white"].layout.template
+my_template.layout.colorway = my_custom_palette
+pio.templates["my_custom_template"] = my_template
+pio.templates.default = "my_custom_template"
+
+
+# Replacing the line on top of the app with a custom color
+# Replace the gradient with a solid color (e.g., blue)
+def custom_top_bar():
+    """
+    Allows for customization of streamlit top bar which is
+    not directly editable via Python. Instead, this function
+    uses HTML-based CSS injection to make the changes.
+    """
+    st.markdown(
+        """
+        <style>
+            div[data-testid="stDecoration"] {
+                background: #1ea2b5;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 # %% Importing data for use in the app
@@ -305,6 +336,7 @@ def add_logo():
 
 # Informs the user of the app's purpose and the selected metric for N of employees
 def show_homepage():
+    custom_top_bar()
     st.header("Welcome to the DK housing affordability app!")
     add_logo()
     st.markdown(
@@ -321,7 +353,7 @@ def show_homepage():
     st.image("Resources/app_image.jpg")
 
     # Displaying more info on how the app can help the user
-    st.subheader("How this app can help you", divider="rainbow")
+    st.subheader("How this app can help you", divider="grey")
     st.markdown(
         """This app focuses on both the sales price of flats and their affordability
         (measured in terms of its relation to personal income). The focus in here is on
@@ -348,7 +380,7 @@ def show_homepage():
     )
 
     # Displaying more info on how to use the app
-    st.subheader("How to use this app", divider="rainbow")
+    st.subheader("How to use this app", divider="grey")
     st.markdown("This app consists of the following two panes:")
     st.markdown(
         """
@@ -366,7 +398,7 @@ def show_homepage():
     st.markdown("You will then be redirected to the desired page.")
 
     # Displaying more info on how the user can filter the data
-    st.subheader("How to apply filters to the data", divider="rainbow")
+    st.subheader("How to apply filters to the data", divider="grey")
     st.markdown(
         """To **apply a filter to the data**, please click on the filter
         you wish to apply and select the desired value(s). Please note that some filters
@@ -403,6 +435,7 @@ def show_homepage():
 
 
 def page_avg_by_mncp(df):
+    custom_top_bar()
     st.header("Housing prices by municipality and year")
     add_logo()
 
@@ -518,6 +551,7 @@ def page_avg_by_mncp(df):
 
 
 def page_afford_by_mncp(df):
+    custom_top_bar()
     st.header("Affordability by municipality and year")
     add_logo()
 
@@ -628,6 +662,7 @@ def page_afford_by_mncp(df):
 
 
 def page_afford_by_mncp_gen(df):
+    custom_top_bar()
     st.header("Affordability by municipality, gender and year")
     add_logo()
 
@@ -694,33 +729,35 @@ def page_afford_by_mncp_gen(df):
         metric_for_use_txt = "Years of annual income needed to buy 50 m²"
         chart_title = f"Number of years of disposable income needed to buy 50 m² in {selected_mncp} split by gender"
 
-    # Create a trace for the first variable
-    trace1 = go.Scatter(
-        x=data_to_display["Year"],
-        y=data_to_display[metric_for_use1],
-        mode="lines",
-        name="Men",
-    )
+    # Tranforming to long format before plotting
+    value_vars = [metric_for_use1, metric_for_use2]
+    id_vars = ["Year", "Municipality"]
+    vars_mapping = {
+        "M2AffordedMen": "Men",
+        "M2AffordedWomen": "Women",
+        "YearsoBuy50M2Men": "Men",
+        "YearsoBuy50M2Women": "Women",
+    }
 
-    # Create a trace for the second variable
-    trace2 = go.Scatter(
-        x=data_to_display["Year"],
-        y=data_to_display[metric_for_use2],
-        mode="lines",
-        name="Women",
+    data_to_display = pd.melt(
+        data_to_display,
+        id_vars=id_vars,
+        value_vars=value_vars,
+        var_name="Gender",
+        value_name=metric_for_use_txt,
     )
+    data_to_display["Gender"] = data_to_display["Gender"].map(vars_mapping)
 
-    # Create a layout
-    layout = go.Layout(
-        title=chart_title,
-        xaxis=dict(title="Year"),
-        yaxis=dict(title=metric_for_use_txt),
+    # Plotting the data on a chart
+    fig = px.line(
+        data_to_display,
+        x="Year",
+        y=metric_for_use_txt,
+        color="Gender",
     )
-
-    # Create a figure and add the traces
-    fig = go.Figure(data=[trace1, trace2], layout=layout)
+    fig.update_layout({"title": chart_title})
     fig.update_traces(textposition="top center")
-    st.plotly_chart(fig)
+    fig
 
     # Displaying more details about how to use the chart
     st.markdown("**Please note that:**")
@@ -763,6 +800,7 @@ def page_afford_by_mncp_gen(df):
 
 
 def page_indexed_dev(df):
+    custom_top_bar()
     st.header("Indexed developments in pricing and income")
     add_logo()
 
@@ -801,39 +839,34 @@ def page_indexed_dev(df):
     ]:
         data_to_display[metric] = np.round(data_to_display[metric], 2)
 
-    # Create a trace for the first variable
-    trace1 = go.Scatter(
-        x=data_to_display["Year"],
-        y=data_to_display["AvgSalesPriceIdx"],
-        mode="lines",
-        name="Average sales price",
+    # Converting the data to the long format before plotting
+    value_vars = ["AvgSalesPriceIdx", "AvgDispIncomeIdx", "GDPIdx"]
+    vars_mapping = {
+        "AvgSalesPriceIdx": "Average sales price (indexed)",
+        "AvgDispIncomeIdx": "Average disposable income (indexed)",
+        "GDPIdx": "GDP (indexed)",
+    }
+    data_to_display = pd.melt(
+        data_to_display,
+        id_vars="Year",
+        value_vars=value_vars,
+        var_name="Indicator",
+        value_name="Index",
     )
+    data_to_display["Indicator"] = data_to_display["Indicator"].map(vars_mapping)
 
-    # Create a trace for the second variable
-    trace2 = go.Scatter(
-        x=data_to_display["Year"],
-        y=data_to_display["AvgDispIncomeIdx"],
-        mode="lines",
-        name="Avg disposable income",
+    # Plotting the data on a chart
+    fig = px.line(
+        data_to_display,
+        x="Year",
+        y="Index",
+        color="Indicator",
     )
-
-    # Create a trace for the second variable
-    trace3 = go.Scatter(
-        x=data_to_display["Year"],
-        y=data_to_display["GDPIdx"],
-        mode="lines",
-        name="National GDP",
+    fig.update_layout(
+        {
+            "title": "Indexed sales price, national disposable income and national GDP over time"
+        }
     )
-
-    # Create a layout
-    layout = go.Layout(
-        title=f"Indexed sales price and local disposable income in {selected_loc} vs. national GDP over time",
-        xaxis=dict(title="Year"),
-        yaxis=dict(title="Indexed value of indicators"),
-    )
-
-    # Create a figure and add the traces
-    fig = go.Figure(data=[trace1, trace2, trace3], layout=layout)
     fig.update_traces(textposition="top center")
     st.plotly_chart(fig)
 
@@ -854,6 +887,7 @@ def page_indexed_dev(df):
 
 
 def page_hist_changes(df):
+    custom_top_bar()
     st.header("Historical changes across municipalities")
     add_logo()
 
@@ -961,7 +995,7 @@ def page_hist_changes(df):
     # =============================================
     # Showing overall insights based on change type
     # =============================================
-    st.subheader(f"Overall changes in {txt_short}", divider="rainbow")
+    st.subheader(f"Overall changes in {txt_short}", divider="grey")
     st.write(
         f"""
             The chart below shows the number of municipalities that have
@@ -984,12 +1018,13 @@ def page_hist_changes(df):
     # ==============================================
     # Showing detailed numbers for each municipality
     # ==============================================
-    st.subheader(f"Changes in {txt_short} by municipality", divider="rainbow")
+    st.subheader(f"Changes in {txt_short} by municipality", divider="grey")
     st.write(
         f"""
             The **table** at the bottom shows data on {txt_for_title} in the
             selected baseline and reference (comparison) years, as well as the
-            change between the two years measured in percentage terms:"""
+            change between the two years measured in percentage terms (**bonus
+            tip**: click on any of the columns to sort the data by that column):"""
     )
 
     # Displaying the full dataframe with all municipalities
@@ -1028,6 +1063,7 @@ def page_hist_changes(df):
 
 
 def page_annual_price_overview(df):
+    custom_top_bar()
     st.header("Overview of housing prices")
     add_logo()
 
@@ -1090,7 +1126,7 @@ def page_annual_price_overview(df):
     fig1.update_layout({"title": "National average buying price per m² over time"})
 
     # Printing info for end user and chart
-    st.subheader("Price development over time", divider="rainbow")
+    st.subheader("Price development over time", divider="grey")
     st.markdown(
         """
                 The chart below shows the development of **historical sales prices**
@@ -1125,11 +1161,11 @@ def page_annual_price_overview(df):
             "Municipality": "Municipality",
             metric_for_use: metric_for_use_txt,
         },
-        color_discrete_sequence=["#EF553B"],
+        # color_discrete_sequence=["#EF553B"],
     )
 
     # Printing info for end user and chart
-    st.subheader("Most expensive municipalities", divider="rainbow")
+    st.subheader("Most expensive municipalities", divider="grey")
     st.markdown(
         """
                 The chart below shows the **most expensive** municipalities to buy
@@ -1166,11 +1202,11 @@ def page_annual_price_overview(df):
             "Municipality": "Municipality",
             metric_for_use: metric_for_use_txt,
         },
-        color_discrete_sequence=["#00CC96"],
+        # color_discrete_sequence=["#00CC96"],
     )
 
     # Printing info for end user and chart
-    st.subheader("Cheapest municipalities", divider="rainbow")
+    st.subheader("Cheapest municipalities", divider="grey")
     st.markdown(
         """
                 The chart below shows the **least expensive** municipalities to buy
@@ -1207,7 +1243,7 @@ def page_annual_price_overview(df):
     )
 
     # Printing info for end user and chart
-    st.subheader("Municipalities with the highest price increase", divider="rainbow")
+    st.subheader("Municipalities with the highest price increase", divider="grey")
     st.markdown(
         """
         The chart below shows the municipalities where the **highest increase** in average sales price per m² is
@@ -1244,7 +1280,7 @@ def page_annual_price_overview(df):
     )
 
     # Printing info for end user and chart
-    st.subheader("Municipalities with the lowest price increase", divider="rainbow")
+    st.subheader("Municipalities with the lowest price increase", divider="grey")
     st.markdown(
         """
         The chart below shows the municipalities where the **lowest increase** in average sales price per m² is
@@ -1259,6 +1295,7 @@ def page_annual_price_overview(df):
 
 
 def page_annual_afford_overview(df):
+    custom_top_bar()
     st.header("Overview of housing affordability")
     add_logo()
 
@@ -1309,11 +1346,11 @@ def page_annual_afford_overview(df):
             "Municipality": "Municipality",
             "M2AffordedTotal": "Buyable m² with annual income",
         },
-        color_discrete_sequence=["#00CC96"],
+        # color_discrete_sequence=["#00CC96"],
     )
 
     # Printing info for end user and chart
-    st.subheader("Most affordable municipalities", divider="rainbow")
+    st.subheader("Most affordable municipalities", divider="grey")
     st.markdown(
         """
                 The chart below shows the **most affordable** municipalities to buy
@@ -1347,11 +1384,11 @@ def page_annual_afford_overview(df):
             "Municipality": "Municipality",
             "M2AffordedTotal": "Buyable m² with annual income",
         },
-        color_discrete_sequence=["#EF553B"],
+        # color_discrete_sequence=["#EF553B"],
     )
 
     # Printing info for end user and chart
-    st.subheader("Least affordable municipalities", divider="rainbow")
+    st.subheader("Least affordable municipalities", divider="grey")
     st.markdown(
         """
                 The chart below shows the **least affordable** municipalities to buy
@@ -1385,11 +1422,11 @@ def page_annual_afford_overview(df):
             "Municipality": "Municipality",
             "AvgM2AffordedTotalChange": "% change in buyable m² with annual income",
         },
-        color_discrete_sequence=["#00CC96"],
+        # color_discrete_sequence=["#00CC96"],
     )
 
     # Printing info for end user and chart
-    st.subheader("Most positive development", divider="rainbow")
+    st.subheader("Most positive development", divider="grey")
     st.markdown(
         """
         The chart below shows the municipalities where the **most positive**
@@ -1433,11 +1470,11 @@ def page_annual_afford_overview(df):
             "Municipality": "Municipality",
             "AvgM2AffordedTotalChange": "% change in buyable m² with annual income",
         },
-        color_discrete_sequence=["#EF553B"],
+        # color_discrete_sequence=["#EF553B"],
     )
 
     # Printing info for end user and chart
-    st.subheader("Most negative development", divider="rainbow")
+    st.subheader("Most negative development", divider="grey")
     st.markdown(
         """
         The chart below shows the municipalities where the **most negative**
@@ -1454,6 +1491,7 @@ def page_annual_afford_overview(df):
 
 
 def page_notes_data():
+    custom_top_bar()
     st.header("Data collection & method")
     add_logo()
     st.markdown(
@@ -1473,7 +1511,7 @@ def page_notes_data():
         """
     )
 
-    st.subheader("Data on sales prices", divider="rainbow")
+    st.subheader("Data on sales prices", divider="grey")
     st.markdown(
         """Data on **prices of owned flats** (*ejerbolig* in Danish) comes
         from the `BM011` table on [Finans Danmark](rkr.statistikbank.dk)
@@ -1506,7 +1544,7 @@ def page_notes_data():
         """
     )
 
-    st.subheader("Data on disposable income", divider="rainbow")
+    st.subheader("Data on disposable income", divider="grey")
     st.markdown(
         """Data on average disposable income by municipality is collected from the `INDKP101` table on [Danmarks Statistik (DST)](www.dst.dk)'s website.
         """
@@ -1522,7 +1560,7 @@ def page_notes_data():
         """
     )
 
-    st.subheader("Data on macroeconomic indicators", divider="rainbow")
+    st.subheader("Data on macroeconomic indicators", divider="grey")
     st.markdown(
         """Background data on most national **macroeconomic indicators**
                 was collected from the most recent editions of the IMF's [World 
@@ -1559,6 +1597,7 @@ def page_notes_data():
 
 
 def page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics):
+    custom_top_bar()
     st.header("Info on model accuracy & method")
     add_logo()
     st.markdown(
@@ -1575,7 +1614,7 @@ def page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics
     selected_metrics = filter_fit_metrics("Accuracy (%) only")
 
     # Displaying background info on the predictions for disposable income
-    st.subheader("Predictions for disposable income", divider="rainbow")
+    st.subheader("Predictions for disposable income", divider="grey")
     st.markdown(
         f"""DST provides data on disposable income with a **significant
         delay**, for example, the data for {prev_year} will only be published in
@@ -1620,7 +1659,7 @@ def page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics
     st.dataframe(data_to_display, hide_index=True)
 
     # Displaying background info on the predictions for future sales price
-    st.subheader("Predictions for future sales price", divider="rainbow")
+    st.subheader("Predictions for future sales price", divider="grey")
     st.markdown(
         """Finans Danmark does not provide predictions for future sales prices, though
         exploring how historical trends might translate into the future can
@@ -1669,7 +1708,7 @@ def page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics
     st.dataframe(data_to_display, hide_index=True)
 
     # Displaying background info on the imputations in historical sales price
-    st.subheader("Imputations in historical prices", divider="rainbow")
+    st.subheader("Imputations in historical prices", divider="grey")
     st.markdown(
         """The way Finans Danmark measures sales prices is based on actual sales, however,
         it is not always the case that sales have been realized in every 
@@ -1718,7 +1757,7 @@ def page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics
     st.dataframe(data_to_display, hide_index=True)
 
     # Closing words on uncertainty
-    st.subheader("On the impact of uncertainty", divider="rainbow")
+    st.subheader("On the impact of uncertainty", divider="grey")
     st.markdown(
         """Uncertainty may impact the numbers shown in this app in two main ways:
         """
@@ -1752,10 +1791,11 @@ def page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics
     )
 
 
-# %% Compulsory legal disclaimer
+# %% Page: Compulsory legal disclaimer
 
 
 def page_legal():
+    custom_top_bar()
     st.header("Legal disclaimer")
     add_logo()
     st.markdown(
