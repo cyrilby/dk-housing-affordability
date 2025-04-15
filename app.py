@@ -36,18 +36,36 @@ pio.templates.default = "my_custom_template"
 
 # Replacing the line on top of the app with a custom color
 # Replace the gradient with a solid color (e.g., blue)
-def custom_top_bar():
+def customize_colors():
     """
-    Allows for customization of streamlit top bar which is
-    not directly editable via Python. Instead, this function
-    uses HTML-based CSS injection to make the changes.
+    Allows for customization of streamlit top bar and the color
+    of the links, which are both not directly editable via Python.
+    Instead, this function uses HTML-based CSS injection to make
+    the required changes.
     """
+
+    # Change the color of the top bar
     st.markdown(
         """
         <style>
             div[data-testid="stDecoration"] {
                 background: #1ea2b5;
             }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Change the color of links (a href)
+    st.markdown(
+        """
+        <style>
+        div[data-testid="stMarkdownContainer"] a {
+            color: #1ea2b5 !important;
+        }
+        div[data-testid="stMarkdownContainer"] a:hover {
+            color: #1ea2b5 !important;
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -336,7 +354,7 @@ def add_logo():
 
 # Informs the user of the app's purpose and the selected metric for N of employees
 def show_homepage():
-    custom_top_bar()
+    customize_colors()
     st.header("Welcome to the DK housing affordability app!")
     add_logo()
     st.markdown(
@@ -435,7 +453,7 @@ def show_homepage():
 
 
 def page_avg_by_mncp(df):
-    custom_top_bar()
+    customize_colors()
     st.header("Housing prices by municipality and year")
     add_logo()
 
@@ -551,7 +569,7 @@ def page_avg_by_mncp(df):
 
 
 def page_afford_by_mncp(df):
-    custom_top_bar()
+    customize_colors()
     st.header("Affordability by municipality and year")
     add_logo()
 
@@ -662,7 +680,7 @@ def page_afford_by_mncp(df):
 
 
 def page_afford_by_mncp_gen(df):
-    custom_top_bar()
+    customize_colors()
     st.header("Affordability by municipality, gender and year")
     add_logo()
 
@@ -800,7 +818,7 @@ def page_afford_by_mncp_gen(df):
 
 
 def page_indexed_dev(df):
-    custom_top_bar()
+    customize_colors()
     st.header("Indexed developments in pricing and income")
     add_logo()
 
@@ -887,7 +905,7 @@ def page_indexed_dev(df):
 
 
 def page_hist_changes(df):
-    custom_top_bar()
+    customize_colors()
     st.header("Historical changes across municipalities")
     add_logo()
 
@@ -1063,7 +1081,7 @@ def page_hist_changes(df):
 
 
 def page_annual_price_overview(df):
-    custom_top_bar()
+    customize_colors()
     st.header("Overview of housing prices")
     add_logo()
 
@@ -1295,7 +1313,7 @@ def page_annual_price_overview(df):
 
 
 def page_annual_afford_overview(df):
-    custom_top_bar()
+    customize_colors()
     st.header("Overview of housing affordability")
     add_logo()
 
@@ -1491,7 +1509,7 @@ def page_annual_afford_overview(df):
 
 
 def page_notes_data():
-    custom_top_bar()
+    customize_colors()
     st.header("Data collection & method")
     add_logo()
     st.markdown(
@@ -1597,7 +1615,7 @@ def page_notes_data():
 
 
 def page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics):
-    custom_top_bar()
+    customize_colors()
     st.header("Info on model accuracy & method")
     add_logo()
     st.markdown(
@@ -1795,7 +1813,7 @@ def page_notes_accuracy(income_fit_metrics, price_imp_metrics, price_fit_metrics
 
 
 def page_legal():
-    custom_top_bar()
+    customize_colors()
     st.header("Legal disclaimer")
     add_logo()
     st.markdown(
