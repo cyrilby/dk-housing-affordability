@@ -64,14 +64,12 @@ FinalSalesAndIncome <- FinalSalesAndIncome %>%
   group_by(Municipality) %>%
   mutate(BaseYearForMncp = min(Year, na.rm = TRUE)) %>%
   ungroup() %>%
-  mutate(BaseAvgPrice = ifelse(Year == BaseYearForMncp,
-                               AvgSalesPrice,
-                               NA)) %>%
+  mutate(BaseAvgPrice = ifelse(Year == BaseYearForMncp, AvgSalesPrice, NA)) %>%
   group_by(Municipality) %>%
   mutate(BaseAvgPrice = mean(BaseAvgPrice, na.rm = TRUE)) %>%
   ungroup() %>%
   mutate(AvgSalesPriceIdx = AvgSalesPrice / BaseAvgPrice) %>%
-  select(-BaseYearForMncp,-BaseAvgPrice)
+  select(-BaseYearForMncp, -BaseAvgPrice)
 
 # Calculating affordability indices for each municipality
 # Note: the "AvgM2AffordedIdx" indices includes both actual & imputed sales prices
@@ -80,21 +78,17 @@ FinalSalesAndIncome <- FinalSalesAndIncome %>%
   mutate(BaseYearForMncp = min(Year, na.rm = TRUE)) %>%
   ungroup() %>%
   mutate(
-    BaseAvgM2AffordedTotal = ifelse(Year == BaseYearForMncp,
-                                    M2AffordedTotal,
-                                    NA),
-    BaseAvgM2AffordedMen = ifelse(Year == BaseYearForMncp,
-                                  M2AffordedMen,
-                                  NA),
-    BaseAvgM2AffordedWomen = ifelse(Year == BaseYearForMncp,
-                                    M2AffordedWomen,
-                                    NA)
+    BaseAvgM2AffordedTotal = ifelse(Year == BaseYearForMncp, M2AffordedTotal, NA),
+    BaseAvgM2AffordedMen = ifelse(Year == BaseYearForMncp, M2AffordedMen, NA),
+    BaseAvgM2AffordedWomen = ifelse(Year == BaseYearForMncp, M2AffordedWomen, NA),
+    BaseAvgSalesPrice = ifelse(Year == BaseYearForMncp, AvgSalesPrice, NA)
   ) %>%
   group_by(Municipality) %>%
   mutate(
     BaseAvgM2AffordedTotal = mean(BaseAvgM2AffordedTotal, na.rm = TRUE),
     BaseAvgM2AffordedMen = mean(BaseAvgM2AffordedMen, na.rm = TRUE),
-    BaseAvgM2AffordedWomen = mean(BaseAvgM2AffordedWomen, na.rm = TRUE)
+    BaseAvgM2AffordedWomen = mean(BaseAvgM2AffordedWomen, na.rm = TRUE),
+    BaseAvgSalesPrice = mean(BaseAvgSalesPrice, na.rm = TRUE)
   ) %>%
   ungroup() %>%
   mutate(
@@ -103,15 +97,22 @@ FinalSalesAndIncome <- FinalSalesAndIncome %>%
     AvgM2AffordedMenChange = (M2AffordedMen - BaseAvgM2AffordedMen) /
       BaseAvgM2AffordedMen,
     AvgM2AffordedWomenChange = (M2AffordedWomen - BaseAvgM2AffordedWomen) /
-      BaseAvgM2AffordedWomen
+      BaseAvgM2AffordedWomen,
+    AvgSalesPriceChange = (AvgSalesPrice - BaseAvgSalesPrice) /
+      BaseAvgSalesPrice
   ) %>%
   mutate(
     AvgM2AffordedTotalChange = round(100 * AvgM2AffordedTotalChange, 1),
     AvgM2AffordedMenChange = round(100 * AvgM2AffordedMenChange, 1),
-    AvgM2AffordedWomenChange = round(100 * AvgM2AffordedWomenChange, 1)
+    AvgM2AffordedWomenChange = round(100 * AvgM2AffordedWomenChange, 1),
+    AvgSalesPriceChange = round(100 * AvgSalesPriceChange, 1)
   ) %>%
   select(
-    -BaseYearForMncp,-BaseAvgM2AffordedTotal,-BaseAvgM2AffordedMen,-BaseAvgM2AffordedWomen
+    -BaseYearForMncp,
+    -BaseAvgM2AffordedTotal,
+    -BaseAvgM2AffordedMen,
+    -BaseAvgM2AffordedWomen,
+    -BaseAvgSalesPrice
   )
 
 # Formatting data types, sorting in the correct order, etc.
@@ -150,12 +151,8 @@ IndexedDevelopment <- IndexedDevelopment %>%
   mutate(BaseYearForMncp = min(Year, na.rm = TRUE)) %>%
   ungroup() %>%
   mutate(
-    BaseAvgDispIncome = ifelse(Year == BaseYearForMncp,
-                               AvgDisposableIncomeTotal,
-                               NA),
-    BaseGDP = ifelse(Year == BaseYearForMncp,
-                     GDP,
-                     NA)
+    BaseAvgDispIncome = ifelse(Year == BaseYearForMncp, AvgDisposableIncomeTotal, NA),
+    BaseGDP = ifelse(Year == BaseYearForMncp, GDP, NA)
   ) %>%
   group_by(Municipality) %>%
   mutate(
@@ -165,11 +162,7 @@ IndexedDevelopment <- IndexedDevelopment %>%
   ungroup() %>%
   mutate(AvgDispIncomeIdx = AvgDisposableIncomeTotal / BaseAvgDispIncome,
          GDPIdx = GDP / BaseGDP) %>%
-  select(-BaseYearForMncp,
-         -BaseAvgDispIncome,
-         -BaseGDP,
-         -GDP,
-         -AvgDisposableIncomeTotal)
+  select(-BaseYearForMncp,-BaseAvgDispIncome,-BaseGDP,-GDP,-AvgDisposableIncomeTotal)
 
 
 # Exporting the data for further analysis ====
@@ -178,7 +171,7 @@ IndexedDevelopment <- IndexedDevelopment %>%
 write_parquet(FinalSalesAndIncome,
               "Output data/FinalSalesAndIncome.parquet")
 
-# Exporing the indexed dataset for similar use
+# Exporting the indexed dataset for similar use
 write_parquet(IndexedDevelopment, "Output data/IndexedDevelopment.parquet")
 
 # Printing a notice to the user

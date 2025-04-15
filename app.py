@@ -4,7 +4,7 @@ Streamlit app backbone
 ======================
 
 Author: kirilboyanovbg[at]gmail.com
-Last meaningful update: 10-04-2025
+Last meaningful update: 15-04-2025
 """
 
 # %% Setting things up
@@ -1179,6 +1179,80 @@ def page_annual_price_overview(df):
                 """
     )
     st.plotly_chart(fig3)
+
+    # ===========================================
+    # Plotting top N mcp with highest price rises
+    # ===========================================
+    # Filtering the data and sorting in the appropriate order
+    data_for_plot = data_to_display[data_to_display["Year"] == year_to_show].copy()
+    data_for_plot = data_for_plot[
+        data_for_plot["Municipality"] != "National average"
+    ].copy()
+    data_for_plot.sort_values("AvgSalesPriceChange", ascending=False, inplace=True)
+    data_for_plot.reset_index(inplace=True, drop=True)
+    data_for_plot = data_for_plot[:n_mncp_to_show].copy()
+    data_for_plot.sort_values("AvgSalesPriceChange", inplace=True)
+
+    # Plotting the data on a chart
+    fig4 = px.bar(
+        data_for_plot,
+        x="AvgSalesPriceChange",
+        y="Municipality",
+        orientation="h",
+        title=f"Top {n_mncp_to_show} municipalities in {year_to_show} with the highest change in price per m² relative to 1992",
+        labels={
+            "Municipality": "Municipality",
+            "AvgSalesPriceChange": "% change in average price per m²",
+        },
+    )
+
+    # Printing info for end user and chart
+    st.subheader("Municipalities with the highest price increase", divider="rainbow")
+    st.markdown(
+        """
+        The chart below shows the municipalities where the **highest increase** in average sales price per m² is
+        recorded, relative to the base year in the data (1992). Please use the filters in the sidebar
+        to adjust the data displayed on the chart.
+        """
+    )
+    st.plotly_chart(fig4)
+
+    # ==========================================
+    # Plotting top N mcp with lowest price rises
+    # ==========================================
+    # Filtering the data and sorting in the appropriate order
+    data_for_plot = data_to_display[data_to_display["Year"] == year_to_show].copy()
+    data_for_plot = data_for_plot[
+        data_for_plot["Municipality"] != "National average"
+    ].copy()
+    data_for_plot.sort_values("AvgSalesPriceChange", inplace=True)
+    data_for_plot.reset_index(inplace=True, drop=True)
+    data_for_plot = data_for_plot[:n_mncp_to_show].copy()
+    data_for_plot.sort_values("AvgSalesPriceChange", ascending=False, inplace=True)
+
+    # Plotting the data on a chart
+    fig5 = px.bar(
+        data_for_plot,
+        x="AvgSalesPriceChange",
+        y="Municipality",
+        orientation="h",
+        title=f"Top {n_mncp_to_show} municipalities in {year_to_show} with the lowest change in price per m² relative to 1992",
+        labels={
+            "Municipality": "Municipality",
+            "AvgSalesPriceChange": "% change in average price per m²",
+        },
+    )
+
+    # Printing info for end user and chart
+    st.subheader("Municipalities with the lowest price increase", divider="rainbow")
+    st.markdown(
+        """
+        The chart below shows the municipalities where the **lowest increase** in average sales price per m² is
+        recorded, relative to the base year in the data (1992). Please use the filters in the sidebar
+        to adjust the data displayed on the chart.
+        """
+    )
+    st.plotly_chart(fig5)
 
 
 # %% Page: annual affordability overview
