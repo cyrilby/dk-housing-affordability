@@ -1053,7 +1053,7 @@ def page_hist_changes(df):
     st.markdown("**Please note that:**")
     st.write(
         """
-        1) By default, the calculations nare based on actual sales prices per m²
+        1) By default, the calculations are based on actual sales prices per m²
         but you can also choose to focus on the two metrics of housing affordability
         seen throughout the rest of the app. To do so, use the 'Metric to show'
         filter in the sidebar.
