@@ -341,11 +341,7 @@ ColsWithYears <-
 # Converting the data to a long format and marking observation type
 MacroDataIMF <- MacroDataIMF %>%
   pivot_longer(cols = any_of(ColsWithYears), names_to = "Year") %>%
-  mutate(ObservationType = ifelse(Year < `Estimates Start After`,
-         "Historical value",
-         "Estimation/Prediction"),
-         Varname = paste(`Subject Descriptor`, Units, sep = "_")
-         )
+  mutate(Varname = paste(`Subject Descriptor`, Units, sep = "_"))
 
 # Preparing proper column names before conversion back to wide format
 MacroDataIMF <- MacroDataIMF %>%
@@ -364,7 +360,7 @@ MacroDataIMF <- MacroDataIMF %>%
 # and years in rows
 MacroDataIMF <- MacroDataIMF %>%
   pivot_wider(
-    id_cols = c("Year", "ObservationType"),
+    id_cols = c("Year"),
     names_from = "VarnameForPivot",
     values_from = "value"
   )

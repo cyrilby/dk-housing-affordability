@@ -148,8 +148,7 @@ PersonalIncomeAfterTax_Wide <-
   read_parquet("Temp data/PersonalIncomeAfterTax_Wide.parquet")
 
 # Macroeconomic indicators
-MacroDataIMF <- read_parquet("Temp data/MacroDataIMF.parquet") %>%
-  select(-ObservationType)
+MacroDataIMF <- read_parquet("Temp data/MacroDataIMF.parquet")
 AnnualInterestRate <-
   read_parquet("Temp data/AnnualInterestRate.parquet")
 
